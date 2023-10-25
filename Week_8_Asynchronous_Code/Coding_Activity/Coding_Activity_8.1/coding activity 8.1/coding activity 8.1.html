@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+  #container {
+    background-color: lightskyblue; 
+    padding: 20px; 
+    border: 1px solid #ccc; 
+    margin: 100px; 
+    width:700px;
+    margin-left:200px;
+    height: 300px;
+    box-shadow: 5px 5px 5px #888888;
+    display: flex; 
+    flex-wrap: nowrap; 
+    justify-content: flex-start; 
+    align-items: center; 
+    }
+  .weather-data {
+    background-color:bisque; 
+    border: 1px solid red; 
+    padding: 10px; 
+    margin-right: 10px; 
+    margin-left: 20px;
+    max-width: 300px; 
+  }
+
+  .weather-data h2 {
+    font-size: 1.5em; 
+    margin-bottom: 10px;
+  }
+  img{
+    border-radius: 10px;
+    width:200px;
+    height:200px;
+margin:70px;
+margin-right: 30px;
+border: 5px solid blue;
+  }
+  #wind{
+    width:50px;
+    height:70px;
+    margin:60px;
+    }
+
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <img id="clearsky" src="./img/clearsky.jpeg">
+        <div id="wind"></div>
+    </div>
+    <script>
+        var image=document.getElementById("clearsky")
+        var wind=document.getElementById("wind")
+        var container = document.getElementById("container");
+    const urlarr=["https://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=2110c11ef91913d9bd4cba9c59d51d51",
+                     "https://api.openweathermap.org/data/2.5/weather?q=Houston&APPID=2110c11ef91913d9bd4cba9c59d51d51",
+                     "https://api.openweathermap.org/data/2.5/weather?q=Lisbon&APPID=2110c11ef91913d9bd4cba9c59d51d51",
+                     "https://api.openweathermap.org/data/2.5/weather?q=Budapest&APPID=2110c11ef91913d9bd4cba9c59d51d51"]
+const makeRequest=async function(url){
+let response=await fetch(url);
+    let data= await response.text();
+    return data;
+}
+var dataArr=[];
+urlarr.forEach((item,key)=>{
+    makeRequest(item).then((result)=>{
+    dataArr.push(result);
+if(dataArr.length==4){
+    for(let i=0;i<4;i++){
+     console.log((JSON.parse(dataArr[i]).name))
+        
+if(JSON.parse(dataArr[i]).name=="London"){
+    create(dataArr[i])
+}
+    }
+    }
+});
+});
+function create(data){
+    let weatherData = JSON.parse(data);
+    let element=document.createElement("div")
+    element.className = "weather-data";
+    if(weatherData.weather[0].description=="clear sky"){
+        image.src="./img/clearsky.jpeg";
+
+    }else if(weatherData.weather[0].description=="broken clouds"){
+image.src="./img/brokenclouds.jpeg"
+    }else if(weatherData.weather[0].description=="overcast clouds"){
+image.src="./img/overcast.jpeg"
+    }
+    let wind1=`<h1>Deg:${weatherData.wind.deg}°</h1>`;//wind":{"speed":6.17,"deg":170}
+    let formattedData = `
+    <h2>${weatherData.name}, ${weatherData.sys.country}</h2>
+    <p>Weather: ${weatherData.weather[0].description}</p>
+    <p>Temperature: ${weatherData.main.temp} °C</p>
+    <p>Feels Like: ${weatherData.main.feels_like} °C</p>
+    <p>Humidity: ${weatherData.main.humidity}%</p>
+    <p>Wind Speed: ${weatherData.wind.speed} km/h</p>
+  `;
+  wind.innerHTML=wind1;
+  element.innerHTML = formattedData;
+ container.appendChild(element)
+}
+</script>
+</body>
+</html>
